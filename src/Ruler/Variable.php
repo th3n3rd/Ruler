@@ -11,9 +11,6 @@
 
 namespace Ruler;
 
-use Ruler\Operator;
-use Ruler\Context;
-
 /**
  * A propositional Variable.
  *
@@ -21,9 +18,9 @@ use Ruler\Context;
  * evaluation, they are replaced with terminal Values, either from the Variable
  * default or from the current Context.
  *
- * @author Justin Hileman <justin@shopopensky.com>
+ * @author Justin Hileman <justin@justinhileman.info>
  */
-class Variable
+class Variable implements VariableOperand
 {
     private $name;
     private $value;
@@ -81,118 +78,12 @@ class Variable
     {
         if (isset($this->name) && isset($context[$this->name])) {
             $value = $context[$this->name];
+        } elseif ($this->value instanceof VariableOperand) {
+            $value = $this->value->prepareValue($context);
         } else {
             $value = $this->value;
         }
 
         return ($value instanceof Value) ? $value : new Value($value);
-    }
-
-    /**
-     * Fluent interface helper to create a contains comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\Contains
-     */
-    public function contains($variable)
-    {
-        return new Operator\Contains($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a contains comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\DoesNotContain
-     */
-    public function doesNotContain($variable)
-    {
-        return new Operator\DoesNotContain($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a GreaterThan comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\GreaterThan
-     */
-    public function greaterThan($variable)
-    {
-        return new Operator\GreaterThan($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a GreaterThanOrEqualTo comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\GreaterThanOrEqualTo
-     */
-    public function greaterThanOrEqualTo($variable)
-    {
-        return new Operator\GreaterThanOrEqualTo($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a LessThan comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\LessThan
-     */
-    public function lessThan($variable)
-    {
-        return new Operator\LessThan($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a LessThanOrEqualTo comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\LessThanOrEqualTo
-     */
-    public function lessThanOrEqualTo($variable)
-    {
-        return new Operator\LessThanOrEqualTo($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a EqualTo comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\EqualTo
-     */
-    public function equalTo($variable)
-    {
-        return new Operator\EqualTo($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Fluent interface helper to create a NotEqualTo comparison operator.
-     *
-     * @param mixed $variable Right side of comparison operator
-     *
-     * @return Operator\NotEqualTo
-     */
-    public function notEqualTo($variable)
-    {
-        return new Operator\NotEqualTo($this, $this->asVariable($variable));
-    }
-
-    /**
-     * Private helper to retrieve a Variable instance for the given $variable.
-     *
-     * @param mixed $variable Variable instance or value
-     *
-     * @return Variable
-     */
-    private function asVariable($variable)
-    {
-        return ($variable instanceof Variable) ? $variable : new Variable(null, $variable);
     }
 }
